@@ -146,8 +146,8 @@ CSRF_TRUSTED_ORIGINS = [
 
 import urllib.parse
 
-redis_url = os.environ.get("REDIS_URL")
-print("REDIS_URL =", os.environ.get("REDIS_URL"))
+redis_url = "redis://default:zcVmQNMLQkyofJIKrMWnNBJEhWSSgoOR@redis.railway.internal:6379"
+
 if redis_url:
     parsed = urllib.parse.urlparse(redis_url)
     CHANNEL_LAYERS = {
