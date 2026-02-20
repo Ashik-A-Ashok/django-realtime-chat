@@ -1,1 +1,1 @@
-web: python manage.py migrate --noinput && daphne chat.asgi:application --port $PORT --bind 0.0.0.0
+web: python manage.py migrate && daphne chat.asgi:application --port $PORT --bind 0.0.0.0
