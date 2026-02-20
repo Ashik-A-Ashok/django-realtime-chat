@@ -103,8 +103,10 @@
     const input = document.getElementById("message-input");
     const sendBtn = document.getElementById("send-btn");
 
+    const protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
+
     const chatSocket = new WebSocket(
-        "ws://" + window.location.host + "/ws/chat/" + receiverId + "/"
+        protocol + window.location.host + "/ws/chat/" + receiverId + "/"
     );
 
     chatSocket.onopen = () => {
