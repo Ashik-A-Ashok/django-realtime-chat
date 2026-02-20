@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 import os
+import urllib.parse
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -144,11 +145,6 @@ CSRF_TRUSTED_ORIGINS = [
     "https://*.railway.app",
 ]
 redis_url = os.environ.get("REDIS_URL")
-if "REDIS_URL" in os.environ:
-    print("REDIS_URL exists in environment")
-else:
-    print("REDIS_URL is NOT present")
-print("REDIS_URL =", os.environ.get("REDIS_URL"))
 
 if redis_url:
     parsed = urllib.parse.urlparse(redis_url)
@@ -157,11 +153,7 @@ if redis_url:
         "default": {
             "BACKEND": "channels_redis.core.RedisChannelLayer",
             "CONFIG": {
-                "hosts": [{
-                    "address": (parsed.hostname, parsed.port),
-                    "password": parsed.password,
-                    "db": 0,
-                }],
+                "hosts": [(redis_url)],
             },
         },
     }
