@@ -16,8 +16,7 @@
 
 
 import os
-import pymysql
-pymysql.install_as_MySQLdb()
+
 # ✅ THIS MUST COME FIRST
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'chat.settings')
 
