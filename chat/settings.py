@@ -144,7 +144,10 @@ CSRF_TRUSTED_ORIGINS = [
     "https://*.railway.app",
 ]
 redis_url = os.environ.get("REDIS_URL")
-
+if "REDIS_URL" in os.environ:
+    print("REDIS_URL exists in environment")
+else:
+    print("REDIS_URL is NOT present")
 print("REDIS_URL =", os.environ.get("REDIS_URL"))
 
 if redis_url:
