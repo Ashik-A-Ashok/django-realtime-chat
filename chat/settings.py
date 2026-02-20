@@ -151,13 +151,17 @@ redis_url = "redis://default:zcVmQNMLQkyofJIKrMWnNBJEhWSSgoOR@redis.railway.inte
 if redis_url:
     parsed = urllib.parse.urlparse(redis_url)
     CHANNEL_LAYERS = {
-        "default": {
-            "BACKEND": "channels_redis.core.RedisChannelLayer",
-            "CONFIG": {
-                "hosts": [("redis.railway.internal", 6379)],
-            },
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [{
+                "address": ("redis.railway.internal", 6379),
+                "password": "zcVmQNMLQkyofJIKrMWnNBJEhWSSgoOR",
+                "db": 0,
+            }],
         },
     }
+}
 else:
     CHANNEL_LAYERS = {
         "default": {
