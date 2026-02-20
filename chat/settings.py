@@ -143,28 +143,31 @@ ALLOWED_HOSTS = ["*"]
 CSRF_TRUSTED_ORIGINS = [
     "https://*.railway.app",
 ]
+redis_url = os.environ.get("REDIS_URL")
 
-import urllib.parse
+print("REDIS_URL =", os.environ.get("REDIS_URL"))
 
+if redis_url:
+    parsed = urllib.parse.urlparse(redis_url)
 
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [{
-                "address": ("redis.railway.internal", 6379),
-                "password": "zcVmQNMLQkyofJIKrMWnNBJEhWSSgoOR",
-                "db": 0,
-            }],
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [{
+                    "address": (parsed.hostname, parsed.port),
+                    "password": parsed.password,
+                    "db": 0,
+                }],
+            },
         },
     }
-}
-# CHANNEL_LAYERS = {
-#         "default": {
-#             "BACKEND": "channels_redis.core.RedisChannelLayer",
-#             "CONFIG": {
-#                 "hosts": [("127.0.0.1", 6379)],
-#             },
-#         },
-#     }
-    
+else:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [("127.0.0.1", 6379)],
+            },
+        },
+    }
