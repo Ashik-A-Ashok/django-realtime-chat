@@ -146,11 +146,8 @@ CSRF_TRUSTED_ORIGINS = [
 
 import urllib.parse
 
-redis_url = "redis://default:zcVmQNMLQkyofJIKrMWnNBJEhWSSgoOR@redis.railway.internal:6379"
 
-if redis_url:
-    parsed = urllib.parse.urlparse(redis_url)
-    CHANNEL_LAYERS = {
+CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
@@ -162,12 +159,12 @@ if redis_url:
         },
     }
 }
-else:
-    CHANNEL_LAYERS = {
-        "default": {
-            "BACKEND": "channels_redis.core.RedisChannelLayer",
-            "CONFIG": {
-                "hosts": [("127.0.0.1", 6379)],
-            },
-        },
-    }
+# CHANNEL_LAYERS = {
+#         "default": {
+#             "BACKEND": "channels_redis.core.RedisChannelLayer",
+#             "CONFIG": {
+#                 "hosts": [("127.0.0.1", 6379)],
+#             },
+#         },
+#     }
+    
