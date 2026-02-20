@@ -154,7 +154,7 @@ if redis_url:
         "default": {
             "BACKEND": "channels_redis.core.RedisChannelLayer",
             "CONFIG": {
-                "hosts": [(parsed.hostname, parsed.port)],
+                "hosts": [("redis.railway.internal", 6379)],
             },
         },
     }
