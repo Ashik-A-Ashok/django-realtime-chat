@@ -4,3 +4,4 @@ channels_redis==4.3.0
 daphne==4.2.1
 redis==7.2.0
 pymysql
+mysqlclient
