@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-rb*ut)!^hl0*@08!afbmjwwgp$*i1zy2go@8zuj^t73zg-v9+@
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -80,14 +80,14 @@ WSGI_APPLICATION = 'chat.wsgi.application'
 #     },
 # }
 
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
-        },
-    },
-}
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "channels_redis.core.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [("127.0.0.1", 6379)],
+#         },
+#     },
+# }
 
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'user_list'
@@ -138,3 +138,32 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+ALLOWED_HOSTS = ["*"] 
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://*.railway.app",
+]
+
+
+import os
+import urllib.parse
+
+redis_url = os.environ.get("REDIS_URL")
+
+if redis_url:
+    parsed = urllib.parse.urlparse(redis_url)
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels_redis.core.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [(parsed.hostname, parsed.port)],
+            },
+        },
+    }
+else:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "channels.layers.InMemoryChannelLayer",
+        },
+    }
