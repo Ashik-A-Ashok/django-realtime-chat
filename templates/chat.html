@@ -99,69 +99,89 @@
 <script>
     const receiverId = {{ receiver_id }};
     const myUserId = {{ request.user.id }};
+
     const chatBox = document.getElementById("chat-box");
     const input = document.getElementById("message-input");
     const sendBtn = document.getElementById("send-btn");
 
     const protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
+    const socketUrl = `${protocol}${window.location.host}/ws/chat/${receiverId}/`;
 
-    const chatSocket = new WebSocket(
-        protocol + window.location.host + "/ws/chat/" + receiverId + "/"
-    );
+    let chatSocket = null;
 
-    chatSocket.onopen = () => {
-        console.log("WebSocket connected");
-    };
+    /* ---------------- CONNECT SOCKET ---------------- */
+    function connectSocket() {
+        chatSocket = new WebSocket(socketUrl);
 
-    chatSocket.onmessage = function (e) {
-        const data = JSON.parse(e.data);
+        chatSocket.onopen = () => {
+            console.log("✅ WebSocket connected");
+        };
 
-        // 🔹 Message from OTHER user only
-        if (!data.type && data.sender_id !== myUserId) {
-            const div = document.createElement("div");
-            div.className = "message other";
-            div.innerText = data.message;
+        chatSocket.onmessage = (e) => {
+            const data = JSON.parse(e.data);
 
-            chatBox.appendChild(div);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
+            // Ignore malformed payloads
+            if (!data.message || !data.sender_id) return;
 
-        // 🔹 Read receipt
-        if (data.type === "read") {
-            document.querySelectorAll(".me .ticks").forEach(el => {
-                el.innerHTML = "✓✓";
-            });
-        }
-    };
+            // 📨 Incoming message (from other user)
+            if (data.sender_id !== myUserId) {
+                appendMessage(data.message, "other");
+            }
+        };
 
+        chatSocket.onclose = () => {
+            console.warn("⚠️ WebSocket closed. Reconnecting...");
+            setTimeout(connectSocket, 1000); // auto-reconnect
+        };
+
+        chatSocket.onerror = (err) => {
+            console.error("WebSocket error:", err);
+            chatSocket.close();
+        };
+    }
+
+    connectSocket();
+
+    /* ---------------- DOM HELPERS ---------------- */
+    function appendMessage(text, type) {
+        const div = document.createElement("div");
+        div.className = `message ${type}`;
+        div.innerHTML = type === "me"
+            ? `${text} <span class="ticks">✓</span>`
+            : text;
+
+        chatBox.appendChild(div);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    /* ---------------- SEND MESSAGE ---------------- */
     function sendMessage() {
         const message = input.value.trim();
         if (!message) return;
 
-        // ✅ ALWAYS show message immediately
-        const div = document.createElement("div");
-        div.className = "message me";
-        div.innerHTML = message + '<span class="ticks">✓</span>';
-        chatBox.appendChild(div);
-        chatBox.scrollTop = chatBox.scrollHeight;
+        // 🚀 Optimistic UI (instant display)
+        appendMessage(message, "me");
 
-        // ✅ Send via WebSocket ONLY if ready
         if (chatSocket.readyState === WebSocket.OPEN) {
             chatSocket.send(JSON.stringify({ message }));
+        } else {
+            console.warn("WebSocket not ready");
         }
 
         input.value = "";
     }
 
+    /* ---------------- EVENTS ---------------- */
     sendBtn.addEventListener("click", sendMessage);
 
-    input.addEventListener("keydown", function (e) {
+    input.addEventListener("keydown", (e) => {
         if (e.key === "Enter") {
             e.preventDefault();
             sendMessage();
         }
     });
 
+    // Scroll on load
     chatBox.scrollTop = chatBox.scrollHeight;
 </script>
 

@@ -84,22 +84,28 @@
         window.location.href = "/chat/chat/" + userId + "/";
     }
 
-    // Presence WebSocket
+</script>
+<script>
+    const protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
+
     const presenceSocket = new WebSocket(
-        "ws://" + window.location.host + "/ws/presence/"
+        protocol + window.location.host + "/ws/presence/"
     );
 
-    presenceSocket.onmessage = function(e) {
+    presenceSocket.onmessage = function (e) {
         const data = JSON.parse(e.data);
-        const dot = document.getElementById("status-" + data.user_id);
 
-        if (dot) {
-            dot.className = data.state === "online"
-                ? "online-dot"
-                : "offline-dot";
+        const dot = document.getElementById("status-" + data.user_id);
+        if (!dot) return;
+
+        if (data.state === "online") {
+            dot.classList.remove("offline-dot");
+            dot.classList.add("online-dot");
+        } else {
+            dot.classList.remove("online-dot");
+            dot.classList.add("offline-dot");
         }
     };
 </script>
-
 </body>
 </html>
